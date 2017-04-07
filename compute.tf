@@ -80,7 +80,7 @@ resource "aws_security_group" "alb" {
 // - Computing
 
 resource "aws_alb" "web" {
-  name            = "${var.project_name}-web_alb"
+  name            = "${var.project_name}-web-alb"
   internal        = false
   security_groups = ["${aws_security_group.alb.id}"]
   subnets         = ["${aws_subnet.us-west-2-ec2.*.id}"]
