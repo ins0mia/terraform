@@ -20,7 +20,7 @@ variable "ec2_subnet_cidr" {
 }
 
 variable "project_name" {
-  default = "test"
+  default = "insomia-test"
 }
 
 variable "ami" {
