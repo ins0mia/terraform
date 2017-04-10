@@ -64,8 +64,8 @@ resource "aws_codedeploy_deployment_config" "web" {
 
 resource "aws_codedeploy_deployment_group" "web" {
   app_name               = "${aws_codedeploy_app.web.name}"
-  deployment_group_name  = "bar"
-  //service_role_arn       = "${aws_iam_role.foo_role.arn}"
+  deployment_group_name  = "${var.project_name}"
+  service_role_arn       = "${aws_iam_role.deploy_role.arn}"
   deployment_config_name = "${aws_codedeploy_deployment_config.web.id}"
 
   autoscaling_groups = ["${aws_autoscaling_group.web.id}"]
