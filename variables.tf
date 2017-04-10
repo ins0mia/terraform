@@ -24,9 +24,8 @@ variable "project_name" {
 }
 
 variable "ami" {
-    description = "ubuntu 16.04 for us-west-2"
-    default = "ami-06f5e367" // ubuntu 14.04 bitnam
-    //default = "ami-a58d0dc5"
+    description = "custom ami: ubuntu 16.04, php5.6, nginx, codedeploy-agent"
+    default = "ami-6cbc2c0c"
 }
 
 variable "vpc_cidr" {
