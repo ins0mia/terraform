@@ -1,1 +1,2 @@
 *.tfstate*
+/private.tfvars
