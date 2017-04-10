@@ -109,6 +109,31 @@ resource "aws_alb_target_group" "web" {
   }
 }
 
+resource "aws_iam_instance_profile" "codedeploy" {
+  name  = "codedeploy-ec2-instance-profile"
+  roles = ["${aws_iam_role.codedeploy_instance.name}"]
+}
+
+resource "aws_iam_role" "codedeploy_instance" {
+  name               = "codedeploy"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+
 resource "aws_alb_listener" "web" {
   load_balancer_arn = "${aws_alb.web.arn}"
   port              = "80"
@@ -121,12 +146,14 @@ resource "aws_alb_listener" "web" {
 }
 
 resource "aws_launch_configuration" "web" {
-  name   = "${var.project_name}-web_configuration"
+  # name   = "${var.project_name}-web_configuration"
   image_id      = "${var.ami}"
   instance_type = "${var.instance_type}"
   security_groups = ["${aws_security_group.web.id}"]
   key_name = "${var.aws_key_name}"
   enable_monitoring = false
+
+  iam_instance_profile = "${aws_iam_instance_profile.codedeploy.name}"
 
   lifecycle {
     create_before_destroy = true
@@ -136,23 +163,17 @@ resource "aws_launch_configuration" "web" {
 resource "aws_autoscaling_group" "web" {
   name_prefix = "web-site-"
   max_size                  = 5
-  min_size                  = 1
+  min_size                  = 2
   default_cooldown          = 60
   health_check_grace_period = 600
   health_check_type         = "ELB"
-  desired_capacity          = 1
+  # desired_capacity          = 1
   vpc_zone_identifier       = ["${aws_subnet.us-west-2-ec2.*.id}"]
   launch_configuration      = "${aws_launch_configuration.web.name}"
   target_group_arns         = ["${aws_alb_target_group.web.arn}"]
 
   lifecycle {
     create_before_destroy = true
-  }
-
-  tag {
-    key                 = "environment"
-    value               = "prod"
-    propagate_at_launch = true
   }
 
   tag {
